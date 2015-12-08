@@ -3,6 +3,7 @@ package com.apps.partizanin.androidappzno;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apps.partizanin.androidappzno.utils.ContentData;
 
@@ -42,7 +44,7 @@ public class MainActivity extends AppCompatActivity
     private CheckBox checkBox4;
     private FloatingActionButton rightButton;
     private FloatingActionButton leftButton;
-    private Button testButton;
+    private FloatingActionButton testButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,15 +62,15 @@ public class MainActivity extends AppCompatActivity
         navigationView.setNavigationItemSelectedListener(this);
 
 
-        setClickListener();
-
         viewInitialization();
+
+        setClickListener();
 
         fillViewsValues();
     }
 
 
-    private void setClickListener(){
+    private void setClickListener() {
 
         View.OnClickListener clickListener = new View.OnClickListener() {
             @Override
@@ -82,6 +84,7 @@ public class MainActivity extends AppCompatActivity
                         loadNextTask();
                         break;
                     case R.id.testButton:
+                        testTask();
                         break;
                 }
             }
@@ -94,13 +97,27 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void testTask() {
+
+        Toast toast = Toast.makeText(getApplicationContext(), "test Button clicked", Toast.LENGTH_SHORT);;
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
+
+    }
+
     private void loadNextTask() {
         //todo implement method
         //todo make new method to read and write clientData
+        Toast toast = Toast.makeText(getApplicationContext(), "ringht Button clicked", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     private void loadPreviousTask() {
         //todo implement method
+        Toast toast = Toast.makeText(getApplicationContext(), "left Button clicked", Toast.LENGTH_SHORT);
+        toast.setGravity(Gravity.CENTER, 0, 0);
+        toast.show();
     }
 
     private void viewInitialization() {
@@ -113,7 +130,7 @@ public class MainActivity extends AppCompatActivity
         checkBox4 = (CheckBox) findViewById(R.id.checkBox4);
         rightButton = (FloatingActionButton) findViewById(R.id.rightButton);
         leftButton = (FloatingActionButton) findViewById(R.id.leftButton);
-        testButton = (Button) findViewById(R.id.testButton);
+        testButton = (FloatingActionButton) findViewById(R.id.testButton);
     }
 
     @Override
@@ -209,7 +226,7 @@ public class MainActivity extends AppCompatActivity
 
         String clientJsonString = clientResource();
         String clientParagraph = "";
-        String clientTask= "";
+        String clientTask = "";
 
         try {
             JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
@@ -220,18 +237,18 @@ public class MainActivity extends AppCompatActivity
         }
 
         ContentData contentData = getContentData(clientParagraph, clientTask);
-            textViewQuestion.setText(contentData.getQuestion());
-            checkBox1.setText(contentData.getAnswers().get(0));
-            checkBox2.setText(contentData.getAnswers().get(1));
-            checkBox3.setText(contentData.getAnswers().get(2));
-            checkBox4.setText(contentData.getAnswers().get(3));
+        textViewQuestion.setText(contentData.getQuestion());
+        checkBox1.setText(contentData.getAnswers().get(0));
+        checkBox2.setText(contentData.getAnswers().get(1));
+        checkBox3.setText(contentData.getAnswers().get(2));
+        checkBox4.setText(contentData.getAnswers().get(3));
 
-            textViewTaskValue.setText(clientTask);
-            textViewParagraphValue.setText(clientParagraph);
+        textViewTaskValue.setText(clientTask);
+        textViewParagraphValue.setText(clientParagraph);
 
     }
 
-    private ContentData getContentData(String paragraph,String task) {
+    private ContentData getContentData(String paragraph, String task) {
         ContentData result = new ContentData();
 
         String jsonString = contentResource();
