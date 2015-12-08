@@ -2,7 +2,6 @@ package com.apps.partizanin.androidappzno;
 
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
 import android.view.View;
 import android.support.design.widget.NavigationView;
@@ -13,6 +12,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 
@@ -40,6 +40,9 @@ public class MainActivity extends AppCompatActivity
     private CheckBox checkBox2;
     private CheckBox checkBox3;
     private CheckBox checkBox4;
+    private FloatingActionButton rightButton;
+    private FloatingActionButton leftButton;
+    private Button testButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,26 +51,56 @@ public class MainActivity extends AppCompatActivity
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.rightButton);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
+        setClickListener();
 
         viewInitialization();
 
         fillViewsValues();
+    }
+
+
+    private void setClickListener(){
+
+        View.OnClickListener clickListener = new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                switch (v.getId()) {
+                    case R.id.leftButton:
+                        loadPreviousTask();
+                        break;
+                    case R.id.rightButton:
+                        loadNextTask();
+                        break;
+                    case R.id.testButton:
+                        break;
+                }
+            }
+        };
+
+        rightButton.setOnClickListener(clickListener);
+        leftButton.setOnClickListener(clickListener);
+        testButton.setOnClickListener(clickListener);
+
+
+    }
+
+    private void loadNextTask() {
+        //todo implement method
+        //todo make new method to read and write clientData
+    }
+
+    private void loadPreviousTask() {
+        //todo implement method
     }
 
     private void viewInitialization() {
@@ -78,6 +111,9 @@ public class MainActivity extends AppCompatActivity
         checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
         checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
         checkBox4 = (CheckBox) findViewById(R.id.checkBox4);
+        rightButton = (FloatingActionButton) findViewById(R.id.rightButton);
+        leftButton = (FloatingActionButton) findViewById(R.id.leftButton);
+        testButton = (Button) findViewById(R.id.testButton);
     }
 
     @Override
