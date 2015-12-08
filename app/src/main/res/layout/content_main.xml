@@ -38,9 +38,9 @@
         android:id="@+id/taskLabel"
         android:textSize="15sp"
         android:textIsSelectable="true"
-        android:layout_alignTop="@+id/paragraphValue"
-        android:layout_centerHorizontal="true"
-        android:text="@string/TaskLabelValue" />
+        android:text="@string/TaskLabelValue"
+        android:layout_below="@+id/paragraphLabel"
+        android:layout_alignEnd="@+id/paragraphLabel" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -97,6 +97,19 @@
         android:layout_marginTop="61dp"
         android:layout_alignEnd="@+id/taskLabel"
         android:layout_toEndOf="@+id/paragraphLabel" />
+
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/testButtonText"
+        android:id="@+id/button"
+        android:textSize="23sp"
+        android:padding="15dp"
+        android:background="#fd4080"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="56dp" />
 
 
 </RelativeLayout>
