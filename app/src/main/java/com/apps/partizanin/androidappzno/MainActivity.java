@@ -1,7 +1,6 @@
 package com.apps.partizanin.androidappzno;
 
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.util.Log;
@@ -14,26 +13,19 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.CheckBox;
+import android.widget.TextView;
 
-import com.apps.partizanin.androidappzno.utils.FilesUtil;
+import com.apps.partizanin.androidappzno.utils.ContentData;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.xmlpull.v1.XmlPullParser;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -41,38 +33,25 @@ import java.io.Writer;
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
-    final String LOG_TAG = "myLogs";
-
-    final String FILENAME = "file";
-
-    final String DIR_SD = "MyFiles";
-    final String FILENAME_SD = "fileSD";
+    private TextView textViewQuestion;
+    private TextView textViewParagraphValue;
+    private TextView textViewTaskValue;
+    private CheckBox checkBox1;
+    private CheckBox checkBox2;
+    private CheckBox checkBox3;
+    private CheckBox checkBox4;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.rightButton);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.v(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
-                Log.d(LOG_TAG, "Файл записан");
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
             }
@@ -86,8 +65,19 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        viewInitialization();
 
-        jsonFile();
+        fillViewsValues();
+    }
+
+    private void viewInitialization() {
+        textViewQuestion = (TextView) findViewById(R.id.questionText);
+        textViewParagraphValue = (TextView) findViewById(R.id.paragraphValue);
+        textViewTaskValue = (TextView) findViewById(R.id.taskValue);
+        checkBox1 = (CheckBox) findViewById(R.id.checkBox1);
+        checkBox2 = (CheckBox) findViewById(R.id.checkBox2);
+        checkBox3 = (CheckBox) findViewById(R.id.checkBox3);
+        checkBox4 = (CheckBox) findViewById(R.id.checkBox4);
     }
 
     @Override
@@ -148,93 +138,8 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    void writeFile() {
-        try {
-            // отрываем поток для записи
-            BufferedWriter bw = new BufferedWriter(
-                    new OutputStreamWriter(openFileOutput(FILENAME, MODE_PRIVATE)));
-
-            // пишем данные
-            bw.write("Содержимое файла123");
-            // закрываем поток
-            bw.close();
-            Log.d(LOG_TAG, "Файл записан");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void readFile() {
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(FILENAME)));
-            String str = "";
-            // читаем содержимое
-            while ((str = br.readLine()) != null) {
-                Log.d(LOG_TAG, str);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void writeFileSD() {
-        // проверяем доступность SD
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
-        }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_SD);
-        // создаем каталог
-        sdPath.mkdirs();
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, FILENAME_SD);
-        try {
-            // открываем поток для записи
-            BufferedWriter bw = new BufferedWriter(new FileWriter(sdFile));
-            // пишем данные
-            bw.write("Содержимое файла на SD");
-            // закрываем поток
-            bw.close();
-            Log.d(LOG_TAG, "Файл записан на SD: " + sdFile.getAbsolutePath());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void readFileSD() {
-        // проверяем доступность SD
-        if (!Environment.getExternalStorageState().equals(
-                Environment.MEDIA_MOUNTED)) {
-            Log.d(LOG_TAG, "SD-карта не доступна: " + Environment.getExternalStorageState());
-            return;
-        }
-        // получаем путь к SD
-        File sdPath = Environment.getExternalStorageDirectory();
-        // добавляем свой каталог к пути
-        sdPath = new File(sdPath.getAbsolutePath() + "/" + DIR_SD);
-        // формируем объект File, который содержит путь к файлу
-        File sdFile = new File(sdPath, FILENAME_SD);
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new FileReader(sdFile));
-            String str = "";
-            // читаем содержимое
-            while ((str = br.readLine()) != null) {
-                Log.d(LOG_TAG, str);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    void jsonFile() {
-        Log.d("MyFilter","jsonFile method");
+    private String contentResource() {
+        Log.d("MyFilter", "contentResource method");
         Writer writer = new StringWriter();
         char[] buffer = new char[1024];
         try (InputStream is = getResources().openRawResource(R.raw.data)) {
@@ -246,24 +151,72 @@ public class MainActivity extends AppCompatActivity
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return writer.toString();
+    }
 
-        String jsonString = writer.toString();
+    private String clientResource() {
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try (InputStream is = getResources().openRawResource(R.raw.clientdata)) {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return writer.toString();
+    }
+
+    private void fillViewsValues() {
+
+        String clientJsonString = clientResource();
+        String clientParagraph = "";
+        String clientTask= "";
+
         try {
-            JSONObject paragraphs =  new JSONObject(jsonString).getJSONObject("paragraphs");
-            JSONObject paragraph1 = paragraphs.getJSONObject("1");
+            JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
+            clientParagraph = clientData.getString("paragraph");
+            clientTask = clientData.getString("task");
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ContentData contentData = getContentData(clientParagraph, clientTask);
+            textViewQuestion.setText(contentData.getQuestion());
+            checkBox1.setText(contentData.getAnswers().get(0));
+            checkBox2.setText(contentData.getAnswers().get(1));
+            checkBox3.setText(contentData.getAnswers().get(2));
+            checkBox4.setText(contentData.getAnswers().get(3));
+
+            textViewTaskValue.setText(clientTask);
+            textViewParagraphValue.setText(clientParagraph);
+
+    }
+
+    private ContentData getContentData(String paragraph,String task) {
+        ContentData result = new ContentData();
+
+        String jsonString = contentResource();
+        try {
+            JSONObject paragraphs = new JSONObject(jsonString).getJSONObject("paragraphs");
+            JSONObject paragraph1 = paragraphs.getJSONObject(paragraph);
             JSONObject tasks = paragraph1.getJSONObject("tasks");
-            JSONObject tasks1 = tasks.getJSONObject("1");
+            JSONObject tasks1 = tasks.getJSONObject(task);
             String question = String.valueOf(tasks1.get("Question"));
             JSONArray answers = tasks1.getJSONArray("Answers");
 
-
-            Log.d("question", question);
-            Log.d("answers",answers.toString());
+            result.setQuestion(question);
+            for (int i = 0; i < answers.length(); i++) {
+                result.getAnswers().add(answers.getString(i));
+            }
 
         } catch (JSONException e) {
             e.printStackTrace();
 
         }
+        return result;
     }
 
 }
