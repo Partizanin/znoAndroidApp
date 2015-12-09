@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +30,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -102,7 +102,7 @@ public class MainActivity extends AppCompatActivity
         Toast toast = Toast.makeText(getApplicationContext(), "test Button clicked", Toast.LENGTH_SHORT);;
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
-
+        getTrueAnswers("1", "3");
     }
 
     private void loadNextTask() {
@@ -222,6 +222,21 @@ public class MainActivity extends AppCompatActivity
         return writer.toString();
     }
 
+    private String trueAnswersResource() {
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try (InputStream is = getResources().openRawResource(R.raw.answrs)) {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return writer.toString();
+    }
+
     private void fillViewsValues() {
 
         String clientJsonString = clientResource();
@@ -270,6 +285,31 @@ public class MainActivity extends AppCompatActivity
 
         }
         return result;
+    }
+
+    private ArrayList<String> getTrueAnswers(String paragraph,String task) {
+
+        ArrayList<String> result = new ArrayList<>();
+
+        String answersResources = trueAnswersResource();
+
+        try {
+            JSONObject paragraphs = new JSONObject(answersResources).getJSONObject("paragraphs");
+            JSONObject paragraph1 = paragraphs.getJSONObject(paragraph);
+            JSONObject tasks = paragraph1.getJSONObject("tasks");
+            JSONObject tasks1 = tasks.getJSONObject(task);
+            JSONArray answers = tasks1.getJSONArray("Answers");
+
+            for (int i = 0; i < answers.length(); i++) {
+                result.add(answers.getString(i));
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+
+        }
+        return result;
+
     }
 
 }
