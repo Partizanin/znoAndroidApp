@@ -30,9 +30,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -57,6 +60,13 @@ public class MainActivity extends AppCompatActivity
     private ImageView icon3;
     private ImageView icon4;
     private Handler handler;
+
+    final String LOG_TAG = "myLogs";
+
+    final String FILENAME = "clientData.json";
+
+    final String DIR_SD = "MyFiles";
+    final String FILENAME_SD = "fileSD";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -113,11 +123,20 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    private void cleanTestValues() {
+        checkBox1.setChecked(false);
+        checkBox2.setChecked(false);
+        checkBox3.setChecked(false);
+        checkBox4.setChecked(false);
+
+        icon1.setVisibility(View.INVISIBLE);
+        icon2.setVisibility(View.INVISIBLE);
+        icon3.setVisibility(View.INVISIBLE);
+        icon4.setVisibility(View.INVISIBLE);
+    }
+
     private void testTask() {
 
-        Toast toast = Toast.makeText(getApplicationContext(), "test Button clicked", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
         testingCurrentTask();
     }
 
@@ -182,16 +201,12 @@ public class MainActivity extends AppCompatActivity
     private void loadNextTask() {
         //todo implement method
         //todo make new method to read and write clientData
-        Toast toast = Toast.makeText(getApplicationContext(), "right Button clicked", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
+
     }
 
     private void loadPreviousTask() {
         //todo implement method
-        Toast toast = Toast.makeText(getApplicationContext(), "left Button clicked", Toast.LENGTH_SHORT);
-        toast.setGravity(Gravity.CENTER, 0, 0);
-        toast.show();
+
     }
 
     private void viewInitialization() {
@@ -398,6 +413,43 @@ public class MainActivity extends AppCompatActivity
         }
         return result;
 
+    }
+
+    private void setClientData(int paragraph, int task) {
+        String clientTask = String.valueOf(task);
+        String clientParagraph = String.valueOf(paragraph);
+
+    }
+
+    void writeFile(String writeText) {
+        // TODO: 10.12.2015 make writable and readable json client data
+        try {
+            // отрываем поток для записи
+            BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
+                    openFileOutput(FILENAME, MODE_PRIVATE)));
+            // пишем данные
+            bw.write("Содержимое файла");
+            // закрываем поток
+            bw.close();
+            Log.d(LOG_TAG, "Файл записан");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void readFile() {
+        try {
+            // открываем поток для чтения
+            BufferedReader br = new BufferedReader(new InputStreamReader(
+                    openFileInput(FILENAME)));
+            String str = "";
+            // читаем содержимое
+            while ((str = br.readLine()) != null) {
+                Log.d(LOG_TAG, str);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
