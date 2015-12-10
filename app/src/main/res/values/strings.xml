@@ -8,4 +8,8 @@
     <string name="ParagraphLabelValue">Параграф: </string>
     <string name="TaskLabelValue">Завдання: </string>
     <string name="testButtonText">Тест</string>
+    <string name="descriptionIcon4">checkIcons</string>
+    <string name="descriptionIcon3">checkIcon</string>
+    <string name="descriptionIcon2">checkIcon</string>
+    <string name="descriptionIcon1">checkIcon</string>
 </resources>

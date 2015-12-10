@@ -1,6 +1,10 @@
 package com.apps.partizanin.androidappzno;
 
+import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.Icon;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.Gravity;
@@ -14,9 +18,11 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.apps.partizanin.androidappzno.utils.ClientData;
 import com.apps.partizanin.androidappzno.utils.ContentData;
 
 import org.json.JSONArray;
@@ -31,6 +37,7 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -45,6 +52,11 @@ public class MainActivity extends AppCompatActivity
     private FloatingActionButton rightButton;
     private FloatingActionButton leftButton;
     private FloatingActionButton testButton;
+    private ImageView icon1;
+    private ImageView icon2;
+    private ImageView icon3;
+    private ImageView icon4;
+    private Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,8 +73,12 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         viewInitialization();
+
+        icon1.setVisibility(View.INVISIBLE);
+        icon2.setVisibility(View.INVISIBLE);
+        icon3.setVisibility(View.INVISIBLE);
+        icon4.setVisibility(View.INVISIBLE);
 
         setClickListener();
 
@@ -99,16 +115,74 @@ public class MainActivity extends AppCompatActivity
 
     private void testTask() {
 
-        Toast toast = Toast.makeText(getApplicationContext(), "test Button clicked", Toast.LENGTH_SHORT);;
+        Toast toast = Toast.makeText(getApplicationContext(), "test Button clicked", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
-        getTrueAnswers("1", "3");
+        testingCurrentTask();
+    }
+
+    private void testingCurrentTask() {
+        ClientData clientData = getClientData();
+        List<String> trueAnswers = getTrueAnswers(clientData.getParagraph(), clientData.getTask());
+        int trueIcon = R.drawable.ic_check_black_36dp;
+        int falsekIcon = R.drawable.ic_close_black_36dp;
+
+        Resources res = getResources();
+
+        if (trueAnswers.contains(checkBox1.getText().toString())) {
+            icon1.setVisibility(View.VISIBLE);
+            icon1.setImageDrawable(res.getDrawable(trueIcon));
+
+        } else {
+            if (checkBox1.isChecked()) {
+                icon1.setVisibility(View.VISIBLE);
+                icon1.setImageDrawable(res.getDrawable(falsekIcon));
+            }
+        }
+
+        if (trueAnswers.contains(checkBox2.getText().toString())) {
+            icon2.setVisibility(View.VISIBLE);
+            icon2.setImageDrawable(res.getDrawable(trueIcon));
+
+        } else {
+
+            if (checkBox2.isChecked()) {
+                icon2.setVisibility(View.VISIBLE);
+                icon2.setImageDrawable(res.getDrawable(falsekIcon));
+            }
+
+        }
+
+        if (trueAnswers.contains(checkBox3.getText().toString())) {
+            icon3.setVisibility(View.VISIBLE);
+            icon3.setImageDrawable(res.getDrawable(trueIcon));
+
+        } else {
+
+            if (checkBox3.isChecked()) {
+                icon3.setVisibility(View.VISIBLE);
+                icon3.setImageDrawable(res.getDrawable(falsekIcon));
+            }
+
+        }
+
+        if (trueAnswers.contains(checkBox4.getText().toString())) {
+            icon4.setVisibility(View.VISIBLE);
+            icon4.setImageDrawable(res.getDrawable(trueIcon));
+
+        }else{
+            if (checkBox4.isChecked()) {
+                icon4.setVisibility(View.VISIBLE);
+                icon4.setImageDrawable(res.getDrawable(falsekIcon));
+            }
+
+        }
     }
 
     private void loadNextTask() {
         //todo implement method
         //todo make new method to read and write clientData
-        Toast toast = Toast.makeText(getApplicationContext(), "ringht Button clicked", Toast.LENGTH_SHORT);
+        Toast toast = Toast.makeText(getApplicationContext(), "right Button clicked", Toast.LENGTH_SHORT);
         toast.setGravity(Gravity.CENTER, 0, 0);
         toast.show();
     }
@@ -131,6 +205,10 @@ public class MainActivity extends AppCompatActivity
         rightButton = (FloatingActionButton) findViewById(R.id.rightButton);
         leftButton = (FloatingActionButton) findViewById(R.id.leftButton);
         testButton = (FloatingActionButton) findViewById(R.id.testButton);
+        icon1 = (ImageView) findViewById(R.id.icon1);
+        icon2 = (ImageView) findViewById(R.id.icon2);
+        icon3 = (ImageView) findViewById(R.id.icon3);
+        icon4 = (ImageView) findViewById(R.id.icon4);
     }
 
     @Override
@@ -192,6 +270,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String contentResource() {
+        /*todo fix this trouble "I/Choreographer: Skipped 86 frames!  The application may be doing too much work on its main thread."*/
         Log.d("MyFilter", "contentResource method");
         Writer writer = new StringWriter();
         char[] buffer = new char[1024];
@@ -238,18 +317,9 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void fillViewsValues() {
-
-        String clientJsonString = clientResource();
-        String clientParagraph = "";
-        String clientTask = "";
-
-        try {
-            JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
-            clientParagraph = clientData.getString("paragraph");
-            clientTask = clientData.getString("task");
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        ClientData clientData = getClientData();
+        String clientParagraph = clientData.getParagraph();
+        String clientTask = clientData.getTask();
 
         ContentData contentData = getContentData(clientParagraph, clientTask);
         textViewQuestion.setText(contentData.getQuestion());
@@ -261,6 +331,24 @@ public class MainActivity extends AppCompatActivity
         textViewTaskValue.setText(clientTask);
         textViewParagraphValue.setText(clientParagraph);
 
+    }
+
+    private ClientData getClientData() {
+        ClientData result = new ClientData();
+        String clientJsonString = clientResource();
+        String clientParagraph = "";
+        String clientTask = "";
+
+        try {
+            JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
+            clientParagraph = clientData.getString("paragraph");
+            clientTask = clientData.getString("task");
+            result = new ClientData(clientParagraph, clientTask);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return result;
     }
 
     private ContentData getContentData(String paragraph, String task) {
