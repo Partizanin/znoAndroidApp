@@ -22,6 +22,7 @@ import android.widget.Toast;
 
 import com.apps.partizanin.androidappzno.utils.ClientData;
 import com.apps.partizanin.androidappzno.utils.ContentData;
+import com.apps.partizanin.androidappzno.utils.ContentDataCount;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -65,6 +66,7 @@ public class MainActivity extends AppCompatActivity
 
     final String DIR_SD = "MyFiles";
     final String FILENAME_SD = "fileSD";
+    ContentDataCount contentDataCount ;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +83,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        contentDataCount = new ContentDataCount(getContentDataCountResource());
+
         viewInitialization();
 
         icon1.setVisibility(View.INVISIBLE);
@@ -92,7 +96,6 @@ public class MainActivity extends AppCompatActivity
 
         fillViewsValues();
     }
-
 
     private void setClickListener() {
 
@@ -197,7 +200,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadNextTask() {
-        /*todo implement loading last task current paragraph*/
+
         ClientData clientData = getClientData();
         String task = String.valueOf(Integer.parseInt(clientData.getTask()) + 1);
         String paragraph = clientData.getParagraph();
@@ -209,7 +212,7 @@ public class MainActivity extends AppCompatActivity
             contentData = getContentData(paragraph, task);
 
             if (contentData == null) {
-                Toast toast = Toast.makeText(getApplicationContext(), "Це останній параграф", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), "Це останнє завдання останнього параграфу", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
             } else {
@@ -233,17 +236,17 @@ public class MainActivity extends AppCompatActivity
         ClientData clientData = getClientData();
         int task = Integer.parseInt(clientData.getTask());
         int paragraph = Integer.parseInt(clientData.getParagraph());
-/*todo implement loading last task current paragraph*/
+
         if (task == 1) {
             if (paragraph == 1) {
 
-                Toast toast = Toast.makeText(getApplicationContext(), "Це перший параграф,та перше завдання", Toast.LENGTH_SHORT);
+                Toast toast = Toast.makeText(getApplicationContext(), "Це перше завдання,першого параграфу", Toast.LENGTH_SHORT);
                 toast.setGravity(Gravity.CENTER, 0, 0);
                 toast.show();
 
             } else {
                 paragraph = paragraph - 1;
-                setClientData(paragraph, task);
+                setClientData(paragraph, contentDataCount.getTaskCount(String.valueOf(paragraph)));
                 cleanTestValues();
                 fillViewsValues();
             }
@@ -373,6 +376,7 @@ public class MainActivity extends AppCompatActivity
         String clientTask = clientData.getTask();
 
         ContentData contentData = getContentData(clientParagraph, clientTask);
+        assert contentData != null;
         textViewQuestion.setText(contentData.getQuestion());
         checkBox1.setText(contentData.getAnswers().get(0));
         checkBox2.setText(contentData.getAnswers().get(1));
@@ -416,17 +420,22 @@ public class MainActivity extends AppCompatActivity
         return result;
     }
 
-    private ContentData getContentData(String paragraph, String task) {
+    private ContentData getContentData(String paragraphRequest, String taskRequest) {
         ContentData result = new ContentData();
 
         String jsonString = contentResource();
         try {
-            JSONObject paragraphs = new JSONObject(jsonString).getJSONObject("paragraphs");
-            JSONObject paragraph1 = paragraphs.getJSONObject(paragraph);
-            JSONObject tasks = paragraph1.getJSONObject("tasks");
-            JSONObject tasks1 = tasks.getJSONObject(task);
-            String question = String.valueOf(tasks1.get("Question"));
-            JSONArray answers = tasks1.getJSONArray("Answers");
+            JSONObject paragraphObject = new JSONObject(jsonString).getJSONObject("paragraphs");
+            JSONObject paragraphValue = paragraphObject.getJSONObject(paragraphRequest);
+            JSONObject tasksObject = paragraphValue.getJSONObject("tasks");
+            JSONObject tasksValue = null;
+            if (!taskRequest.equals("last")) {
+                tasksValue = tasksObject.getJSONObject(taskRequest);
+            }else {
+                tasksValue = tasksObject.getJSONObject(String.valueOf(contentDataCount.getTaskCount(paragraphRequest)));
+            }
+            String question = String.valueOf(tasksValue.get("Question"));
+            JSONArray answers = tasksValue.getJSONArray("Answers");
 
             result.setQuestion(question);
             for (int i = 0; i < answers.length(); i++) {
@@ -484,7 +493,6 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void writeClientDataFile(String writeText) {
-        // TODO: 10.12.2015 make writable and readable json client data
         try {
             // отрываем поток для записи
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
@@ -517,6 +525,21 @@ public class MainActivity extends AppCompatActivity
        }
        return result;
    }
+
+    private String getContentDataCountResource(){
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try (InputStream is = getResources().openRawResource(R.raw.datacount)) {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return writer.toString();
+    }
 
 }
 
