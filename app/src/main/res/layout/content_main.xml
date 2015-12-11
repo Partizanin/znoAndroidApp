@@ -89,14 +89,13 @@
         android:layout_alignParentLeft="true" />
 
     <TextView
-        android:layout_width="wrap_content"
+        android:layout_width="360dp"
         android:layout_height="wrap_content"
         android:text="New Text"
         android:id="@+id/questionText"
-        android:layout_below="@+id/paragraphLabel"
-        android:layout_marginTop="61dp"
-        android:layout_alignEnd="@+id/taskLabel"
-        android:layout_toEndOf="@+id/paragraphLabel" />
+        android:layout_marginTop="46dp"
+        android:layout_below="@+id/taskValue"
+        android:layout_centerHorizontal="true" />
 
     <ImageView
         android:layout_width="wrap_content"
