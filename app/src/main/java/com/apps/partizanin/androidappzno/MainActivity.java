@@ -1,26 +1,22 @@
 package com.apps.partizanin.androidappzno;
 
 import android.content.res.Resources;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.Icon;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
-import android.util.Log;
-import android.view.Gravity;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.apps.partizanin.androidappzno.utils.ClientData;
 import com.apps.partizanin.androidappzno.utils.ContentData;
@@ -144,7 +140,7 @@ public class MainActivity extends AppCompatActivity
         ClientData clientData = getClientData();
         List<String> trueAnswers = getTrueAnswers(clientData.getParagraph(), clientData.getTask());
         int trueIcon = R.drawable.ic_check_black_36dp;
-        int falsekIcon = R.drawable.ic_close_black_36dp;
+        int falseIcon = R.drawable.ic_close_black_36dp;
 
         Resources res = getResources();
 
@@ -155,7 +151,7 @@ public class MainActivity extends AppCompatActivity
         } else {
             if (checkBox1.isChecked()) {
                 icon1.setVisibility(View.VISIBLE);
-                icon1.setImageDrawable(res.getDrawable(falsekIcon));
+                icon1.setImageDrawable(res.getDrawable(falseIcon));
             }
         }
 
@@ -167,7 +163,7 @@ public class MainActivity extends AppCompatActivity
 
             if (checkBox2.isChecked()) {
                 icon2.setVisibility(View.VISIBLE);
-                icon2.setImageDrawable(res.getDrawable(falsekIcon));
+                icon2.setImageDrawable(res.getDrawable(falseIcon));
             }
 
         }
@@ -180,7 +176,7 @@ public class MainActivity extends AppCompatActivity
 
             if (checkBox3.isChecked()) {
                 icon3.setVisibility(View.VISIBLE);
-                icon3.setImageDrawable(res.getDrawable(falsekIcon));
+                icon3.setImageDrawable(res.getDrawable(falseIcon));
             }
 
         }
@@ -192,7 +188,7 @@ public class MainActivity extends AppCompatActivity
         }else{
             if (checkBox4.isChecked()) {
                 icon4.setVisibility(View.VISIBLE);
-                icon4.setImageDrawable(res.getDrawable(falsekIcon));
+                icon4.setImageDrawable(res.getDrawable(falseIcon));
             }
 
         }
@@ -201,7 +197,7 @@ public class MainActivity extends AppCompatActivity
     private void loadNextTask() {
         //todo implement method
         //todo make new method to read and write clientData
-
+        setClientData(1, 2);
     }
 
     private void loadPreviousTask() {
@@ -302,18 +298,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private String clientResource() {
-        Writer writer = new StringWriter();
-        char[] buffer = new char[1024];
-        try (InputStream is = getResources().openRawResource(R.raw.clientdata)) {
-            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            int n;
-            while ((n = reader.read(buffer)) != -1) {
-                writer.write(buffer, 0, n);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return writer.toString();
+        return readClientDataFile();
     }
 
     private String trueAnswersResource() {
@@ -354,11 +339,25 @@ public class MainActivity extends AppCompatActivity
         String clientParagraph = "";
         String clientTask = "";
 
+
         try {
-            JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
-            clientParagraph = clientData.getString("paragraph");
-            clientTask = clientData.getString("task");
-            result = new ClientData(clientParagraph, clientTask);
+
+            if (!clientJsonString.isEmpty()) {
+                JSONObject clientData = new JSONObject(clientJsonString).getJSONObject("lastLocation");
+                clientParagraph = clientData.getString("paragraph");
+                clientTask = clientData.getString("task");
+                result = new ClientData(clientParagraph, clientTask);
+            }else {
+                JSONObject clientData = new JSONObject();
+                JSONObject lastLocationData = new JSONObject();
+                lastLocationData.put("paragraph", 1);
+                lastLocationData.put("task", 1);
+                clientData.put("lastLocation", lastLocationData);
+                writeClientDataFile(clientData.toString());
+                result = new ClientData("1", "1");
+            }
+
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -416,19 +415,31 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void setClientData(int paragraph, int task) {
-        String clientTask = String.valueOf(task);
-        String clientParagraph = String.valueOf(paragraph);
+
+        try {
+            JSONObject fullObj = new JSONObject(readClientDataFile());
+            JSONObject clientData = fullObj.getJSONObject("lastLocation");
+
+            clientData.put("paragraph", paragraph);
+            clientData.put("task", task);
+            fullObj.put("lastLocation", clientData);
+
+            writeClientDataFile(fullObj.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
-    void writeFile(String writeText) {
+    private void writeClientDataFile(String writeText) {
         // TODO: 10.12.2015 make writable and readable json client data
         try {
             // отрываем поток для записи
             BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(
                     openFileOutput(FILENAME, MODE_PRIVATE)));
             // пишем данные
-            bw.write("Содержимое файла");
+            bw.write(writeText);
             // закрываем поток
             bw.close();
             Log.d(LOG_TAG, "Файл записан");
@@ -437,20 +448,25 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    void readFile() {
-        try {
-            // открываем поток для чтения
-            BufferedReader br = new BufferedReader(new InputStreamReader(
-                    openFileInput(FILENAME)));
-            String str = "";
-            // читаем содержимое
-            while ((str = br.readLine()) != null) {
-                Log.d(LOG_TAG, str);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+   private String readClientDataFile() {
+       String result = "";
+       boolean fileNotFound = false;
+       try {
+           // открываем поток для чтения
+           BufferedReader br = new BufferedReader(new InputStreamReader(
+                   openFileInput(FILENAME)));
+           String line = "";
+           // читаем содержимое
+           while ((line = br.readLine()) != null) {
+               result += line;
+               Log.d(LOG_TAG, result);
+           }
+       } catch (FileNotFoundException ignored) {
+       } catch (IOException e) {
+           e.printStackTrace();
+       }
+       return result;
+   }
 
 }
 
