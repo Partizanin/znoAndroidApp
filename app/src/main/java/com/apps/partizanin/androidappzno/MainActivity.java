@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadNextTask() {
+        /*todo implement loading last task current paragraph*/
         ClientData clientData = getClientData();
         String task = String.valueOf(Integer.parseInt(clientData.getTask()) + 1);
         String paragraph = clientData.getParagraph();
@@ -228,10 +229,30 @@ public class MainActivity extends AppCompatActivity
 
     }
 
-
-
     private void loadPreviousTask() {
-        //todo implement method
+        ClientData clientData = getClientData();
+        int task = Integer.parseInt(clientData.getTask());
+        int paragraph = Integer.parseInt(clientData.getParagraph());
+/*todo implement loading last task current paragraph*/
+        if (task == 1) {
+            if (paragraph == 1) {
+
+                Toast toast = Toast.makeText(getApplicationContext(), "Це перший параграф,та перше завдання", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+
+            } else {
+                paragraph = paragraph - 1;
+                setClientData(paragraph, task);
+                cleanTestValues();
+                fillViewsValues();
+            }
+        } else {
+            task = task - 1;
+            setClientData(paragraph, task);
+            cleanTestValues();
+            fillViewsValues();
+        }
 
     }
 
