@@ -11,12 +11,14 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.apps.partizanin.androidappzno.utils.ClientData;
 import com.apps.partizanin.androidappzno.utils.ContentData;
@@ -195,10 +197,38 @@ public class MainActivity extends AppCompatActivity
     }
 
     private void loadNextTask() {
-        //todo implement method
-        //todo make new method to read and write clientData
-        setClientData(1, 2);
+        ClientData clientData = getClientData();
+        String task = String.valueOf(Integer.parseInt(clientData.getTask()) + 1);
+        String paragraph = clientData.getParagraph();
+        ContentData contentData = getContentData(paragraph, task);
+
+        if (contentData == null) {
+            task = String.valueOf(1);
+            paragraph = String.valueOf(Integer.parseInt(clientData.getParagraph()) + 1);
+            contentData = getContentData(paragraph, task);
+
+            if (contentData == null) {
+                Toast toast = Toast.makeText(getApplicationContext(), "Це останній параграф", Toast.LENGTH_SHORT);
+                toast.setGravity(Gravity.CENTER, 0, 0);
+                toast.show();
+            } else {
+                setClientData(Integer.parseInt(paragraph), Integer.parseInt(task));
+                cleanTestValues();
+                fillViewsValues();
+            }
+
+        }else {
+
+            setClientData(Integer.parseInt(paragraph), Integer.parseInt(task));
+            cleanTestValues();
+            fillViewsValues();
+        }
+
+
+
     }
+
+
 
     private void loadPreviousTask() {
         //todo implement method
@@ -383,7 +413,7 @@ public class MainActivity extends AppCompatActivity
             }
 
         } catch (JSONException e) {
-            e.printStackTrace();
+            return null;
 
         }
         return result;
@@ -450,7 +480,6 @@ public class MainActivity extends AppCompatActivity
 
    private String readClientDataFile() {
        String result = "";
-       boolean fileNotFound = false;
        try {
            // открываем поток для чтения
            BufferedReader br = new BufferedReader(new InputStreamReader(
