@@ -64,8 +64,6 @@ public class MainActivity extends AppCompatActivity
 
     final String FILENAME = "clientData.json";
 
-    final String DIR_SD = "MyFiles";
-    final String FILENAME_SD = "fileSD";
     ContentDataCount contentDataCount ;
 
     @Override

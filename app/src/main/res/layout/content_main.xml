@@ -59,7 +59,8 @@
         android:id="@+id/checkBox1"
         android:layout_below="@+id/paragraphLabel"
         android:layout_alignParentStart="true"
-        android:layout_marginTop="196dp" />
+        android:layout_marginTop="196dp"
+        android:maxWidth="290dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -68,7 +69,8 @@
         android:id="@+id/checkBox2"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/checkBox1"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:maxWidth="290dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -77,7 +79,8 @@
         android:id="@+id/checkBox3"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/checkBox2"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:maxWidth="290dp" />
 
     <CheckBox
         android:layout_width="wrap_content"
@@ -86,7 +89,8 @@
         android:id="@+id/checkBox4"
         android:layout_alignParentStart="true"
         android:layout_below="@+id/checkBox3"
-        android:layout_alignParentLeft="true" />
+        android:layout_alignParentLeft="true"
+        android:maxWidth="290dp" />
 
     <TextView
         android:layout_width="360dp"
