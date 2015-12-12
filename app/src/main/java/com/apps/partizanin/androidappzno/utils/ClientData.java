@@ -1,13 +1,14 @@
 package com.apps.partizanin.androidappzno.utils;
 
-/**
- * Created by Partizanin on 10.12.2015.
- */
+
 public class ClientData {
     private String paragraph;
     private String task;
 
     public ClientData() {
+    }
+
+    public ClientData(String resource) {
     }
 
     public ClientData(String paragraph, String task) {
@@ -22,4 +23,6 @@ public class ClientData {
     public String getTask() {
         return task;
     }
+
+
 }

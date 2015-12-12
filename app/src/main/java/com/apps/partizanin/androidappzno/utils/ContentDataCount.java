@@ -1,5 +1,6 @@
 package com.apps.partizanin.androidappzno.utils;
 
+import android.content.res.Resources;
 import android.support.v7.app.AppCompatActivity;
 
 import com.apps.partizanin.androidappzno.R;
@@ -15,14 +16,14 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.Writer;
 
-public class ContentDataCount  {
+public class ContentDataCount  extends AppCompatActivity{
 
     private int paragraphCount;
 
     private String resource;
 
-    public ContentDataCount(String resource) {
-        this.resource = resource;
+    public ContentDataCount(Resources resources) {
+        this.resource = getContentDataCountResource(resources);
         paragraphCount = getParagraphsCount();
     }
 
@@ -58,4 +59,18 @@ public class ContentDataCount  {
         return result;
     }
 
+    private String getContentDataCountResource(Resources resources){
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try (InputStream is = resources.openRawResource(R.raw.datacount)) {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return writer.toString();
+    }
 }

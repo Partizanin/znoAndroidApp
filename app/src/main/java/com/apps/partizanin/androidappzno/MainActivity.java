@@ -64,7 +64,8 @@ public class MainActivity extends AppCompatActivity
 
     final String FILENAME = "clientData.json";
 
-    ContentDataCount contentDataCount ;
+    private ContentDataCount contentDataCount;
+    private ClientData clientData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,8 +82,8 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        contentDataCount = new ContentDataCount(getContentDataCountResource());
-
+        contentDataCount = new ContentDataCount(getResources());
+        clientData = new ClientData(readClientDataFile());
         viewInitialization();
 
         icon1.setVisibility(View.INVISIBLE);
@@ -523,21 +524,6 @@ public class MainActivity extends AppCompatActivity
        }
        return result;
    }
-
-    private String getContentDataCountResource(){
-        Writer writer = new StringWriter();
-        char[] buffer = new char[1024];
-        try (InputStream is = getResources().openRawResource(R.raw.datacount)) {
-            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
-            int n;
-            while ((n = reader.read(buffer)) != -1) {
-                writer.write(buffer, 0, n);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return writer.toString();
-    }
 
 }
 
